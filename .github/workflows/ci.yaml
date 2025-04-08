@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y cmake ninja-build libomp-dev libgtest-dev libgmock-dev
+      - name: ci
+        run: |
+          cmake --preset debug
+          cmake --build build/debug
+          ctest --preset default --output-on-failure
+
